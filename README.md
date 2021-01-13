@@ -1,6 +1,6 @@
 # snake
-snake game made as an excercise for pyladies course
-i was no cheating!
+- snake game made as an excercise for pyladies course
+- i was no cheating! :3
 
 ## requirements
 - python3
@@ -15,4 +15,4 @@ python3 snake.py
 
 ## notes
 - resize game window by changing WINDOW_WIDTH and WINDOW_HEIGHT vars
-- alter speed by chaning SPEED var
+- alter speed by changing SPEED var
