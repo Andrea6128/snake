@@ -9,6 +9,7 @@
 ## install
 - make sure your venv is set
 - ```pip install -r requirements.txt``` or just install pyglet into your new venv ```pip install pyglet```
+- make sure '/assets' directory is present
 
 ## run
 python3 snake.py

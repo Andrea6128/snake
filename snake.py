@@ -22,7 +22,6 @@ def initial_settings():
     global DIRECTION
     global SPEED
     global IS_END
-    # global IS_TITLE
 
     TILES_DIRECTORY = Path('assets/snake-tiles')
     WINDOW_WIDTH = 1000
@@ -38,7 +37,6 @@ def initial_settings():
     DIRECTION = (1, 0)  # default direction is to the right
     SPEED = .2
     IS_END = False
-    # IS_TITLE = False
 
 
 def collect_filenames():
@@ -52,23 +50,42 @@ def collect_filenames():
     return pictures
 
 
-# TODO
 def title_screen():
+    """ title screen """
+
     global IS_TITLE
     IS_TITLE = True
 
     window.clear()
     pyglet.clock.unschedule(tik)
 
-    label_title_text = pyglet.text.Label('TITLE SCREEN!',
-                            font_name='Courier New',
-                            font_size=32,
-                            bold=True,
-                            color=(230, 230, 230, 230),
-                            x=window.width // 2, y=(window.height // 2) - 64,
+    title_name_picture.x = (window.width - title_name_picture.width) // 2
+    title_name_picture.y = window.height // 1.3
+    title_name_picture.draw()
+
+    label_credits_text = pyglet.text.Label('- by Aja6128 -',
+                            font_name='16bfZX',
+                            font_size=36,
+                            color=(210, 0, 120, 230),
+                            x=window.width // 2, y=(window.height // 1.35),
                             anchor_x='center', anchor_y='center')
-    label_title_text.draw()
-    print("stop here")
+    label_credits_text.draw()
+
+    snake_picture.x = (window.width - snake_picture.width) // 2
+    snake_picture.y = window.height // 2.7
+    snake_picture.draw()
+
+    pyladies_picture.x = (window.width - pyladies_picture.width) // 2
+    pyladies_picture.y = window.height // 4.6
+    pyladies_picture.draw()
+
+    label_press_enter_text = pyglet.text.Label('+ + + Press [ENTER] to start + + +',
+                            font_name='16bfZX',
+                            font_size=36,
+                            color=(230, 230, 0, 200),
+                            x=window.width // 2, y=(window.height // 6.2),
+                            anchor_x='center', anchor_y='center')
+    label_press_enter_text.draw()
 
 
 def game_over(message):
@@ -77,27 +94,40 @@ def game_over(message):
     global IS_END
     IS_END = True
 
+    if SCORE[0] > HISCORE[0]:
+        HISCORE[0] = SCORE[0]
+
     window.clear()
     pyglet.clock.unschedule(tik)
-    label_game_over_score = pyglet.text.Label('Your score is '+str(SCORE[0]),
+    label_game_over_score = pyglet.text.Label('Score: '+str(SCORE[0]),
                             font_name='16bfZX',
                             font_size=48,
                             color=(230, 230, 230, 230),
-                            x=window.width // 2, y=(window.height // 2) - 64,
+                            x=window.width // 2, y=(window.height // 2) - 48,
                             anchor_x='center', anchor_y='center')
     label_game_over_score.draw()
+
+    label_game_over_hiscore = pyglet.text.Label('High score: '+str(HISCORE[0]),
+                            font_name='16bfZX',
+                            font_size=48,
+                            color=(230, 230, 230, 230),
+                            x=window.width // 2, y=(window.height // 2) - 96,
+                            anchor_x='center', anchor_y='center')
+    label_game_over_hiscore.draw()
+
     label_bye = pyglet.text.Label(message,
                             font_name='16bfZX',
-                            font_size=32,
+                            font_size=36,
                             bold=True,
                             color=(220, 220, 220, 220),
                             x=window.width // 2, y=(window.height // 2) + 128,
                             anchor_x='center', anchor_y='center')
     label_bye.draw()
+
     label_escape = pyglet.text.Label('Press [ENTER] to play again or [ESC] to exit',
                             font_name='16bfZX',
-                            font_size=32,
-                            color=(170, 170, 170, 170),
+                            font_size=36,
+                            color=(230, 230, 0, 200),
                             x=window.width // 2, y=(window.height // 4),
                             anchor_x='center', anchor_y='center')
     label_escape.draw()
@@ -145,8 +175,8 @@ def key_press(symbol, modificators):
         PRESSED_KEYS.add((1, 0))
     if symbol == key.RETURN and IS_END:
         restart_game()
-    # if symbol == key.R and IS_TITLE:
-    #     restart_game()
+    if symbol == key.RETURN and IS_TITLE:
+        restart_game()
 
 
 def key_release(symbol, modificators):
@@ -181,7 +211,7 @@ def eat_itself():
     """ if snake eats itself """
 
     if SNAKE[-1] in SNAKE[:-2]:
-        print("snake ate itself")
+        # print("snake ate itself")
         game_over("The snake ate itself")
         return True
 
@@ -221,7 +251,7 @@ def eat_food():
         # add piece of snake to the end
         SNAKE.insert(0, (SNAKE[0][0], SNAKE[0][1]))
 
-        print(FOOD)
+        # print(FOOD)
         SCORE[0] += 1
 
 
@@ -270,17 +300,29 @@ def draw_score():
     """ draws score text """
 
     # font_size parameter reflects window size
-    label_score = pyglet.text.Label(str(SCORE[0]),
-                          font_name='16bfZX',
-                          font_size=int(TILE_SIZE),
-                          x=(window.width / 2) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE / 1.2))
+    label_score = pyglet.text.Label("SC "+str(SCORE[0]),
+                            font_name='16bfZX',
+                            font_size=int(TILE_SIZE) * 2,
+                            color=(200, 200, 200, 200),
+                            x=((window.width / 2) / 2) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.5),
+                            anchor_x='center')
+
     label_score.draw()
 
+    label_hi_score = pyglet.text.Label("HI "+str(HISCORE[0]),
+                            font_name='16bfZX',
+                            font_size=int(TILE_SIZE) * 2,
+                            color=(200, 200, 200, 200),
+                            x=(((window.width / 2) / 2) * 3) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.5),
+                            anchor_x='center')
+
+    label_hi_score.draw()
+
     label_steps = pyglet.text.Label(str(STEPS[0]),
-                          font_name='16bfZX',
-                          font_size=int(TILE_SIZE // 2),
-                          color=(48, 114, 255, 255),
-                          x=TILE_SIZE // 5, y=window.height - (TILE_SIZE // 2))
+                            font_name='16bfZX',
+                            font_size=int(TILE_SIZE // 2),
+                            color=(48, 114, 255, 255),
+                            x=TILE_SIZE // 5, y=window.height - (TILE_SIZE // 2))
     label_steps.draw()
 
 
@@ -288,29 +330,34 @@ def draw_all():
     """ main draw function """
 
     window.clear()
-    draw_score()
 
-    # sprite's edges smoothing
-    pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-    pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
- 
-    test_keys()
-    eat_food()
+    if IS_TITLE:
+        title_screen()
 
-    if playfield_collision_test() == False and eat_itself() == False:
+    else:
+        draw_score()
 
-        # draw snake
-        # not mine :'(
-        for index, value in enumerate(SNAKE):
-            snake_piece_img_name = get_image_name(index)
-            snake_cell = picture_names[snake_piece_img_name]
-            snake_cell.blit(value[0] * TILE_SIZE, value[1] * TILE_SIZE, width=TILE_SIZE, height=TILE_SIZE)
+        # sprite's edges smoothing
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+    
+        test_keys()
+        eat_food()
 
-        # draw food
-        # copies snake drawing idea above, but uses "apple" image only
-        for index, value in enumerate(FOOD):
-            food_cell = picture_names["apple"]
-            food_cell.blit(value[0] * TILE_SIZE, value[1] * TILE_SIZE, width=TILE_SIZE, height=TILE_SIZE)
+        if playfield_collision_test() == False and eat_itself() == False:
+
+            # draw snake
+            # not mine :'(
+            for index, value in enumerate(SNAKE):
+                snake_piece_img_name = get_image_name(index)
+                snake_cell = picture_names[snake_piece_img_name]
+                snake_cell.blit(value[0] * TILE_SIZE, value[1] * TILE_SIZE, width=TILE_SIZE, height=TILE_SIZE)
+
+            # draw food
+            # copies snake drawing idea above, but uses "apple" image only
+            for index, value in enumerate(FOOD):
+                food_cell = picture_names["apple"]
+                food_cell.blit(value[0] * TILE_SIZE, value[1] * TILE_SIZE, width=TILE_SIZE, height=TILE_SIZE)
 
            
 def restart_game():
@@ -318,22 +365,37 @@ def restart_game():
 
     initial_settings()
 
+    global IS_TITLE
+    IS_TITLE = False
+
     window.clear()
     pyglet.clock.schedule_interval(tik, SPEED)
 
 
 # first start
+
+# set vars before initial settings to show title screen and reset hiscore
+global IS_TITLE
+global HISCORE
+IS_TITLE = True
+HISCORE = [0]
+
 initial_settings()
 window = pyglet.window.Window(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
 
 picture_names = collect_filenames()  # get dict with tile names
 
+# set sprites
 snake = pyglet.sprite.Sprite(picture_names['left-dead'])
 food = pyglet.sprite.Sprite(picture_names['apple'])
 game_over_picture = pyglet.sprite.Sprite(picture_names['game_over'])
+title_name_picture = pyglet.sprite.Sprite(picture_names['title'])
+snake_picture = pyglet.sprite.Sprite(picture_names['snake'])
+pyladies_picture = pyglet.sprite.Sprite(picture_names['pyladies'])
 
+# load font
 pyglet.font.add_file('assets/font/16bfZX.ttf')
-my_font = pyglet.font.load('16bfZX, 16')
+# my_font = pyglet.font.load('16bfZX, 16')
 
 
 # main loop
