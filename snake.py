@@ -24,7 +24,7 @@ def initial_settings():
     global IS_END
     # global IS_TITLE
 
-    TILES_DIRECTORY = Path('snake-tiles')
+    TILES_DIRECTORY = Path('assets/snake-tiles')
     WINDOW_WIDTH = 1000
     WINDOW_HEIGHT = 800
     TILE_SIZE = WINDOW_WIDTH // 20
@@ -80,27 +80,25 @@ def game_over(message):
     window.clear()
     pyglet.clock.unschedule(tik)
     label_game_over_score = pyglet.text.Label('Your score is '+str(SCORE[0]),
-                            font_name='Courier New',
-                            font_size=32,
-                            bold=True,
+                            font_name='16bfZX',
+                            font_size=48,
                             color=(230, 230, 230, 230),
                             x=window.width // 2, y=(window.height // 2) - 64,
                             anchor_x='center', anchor_y='center')
     label_game_over_score.draw()
     label_bye = pyglet.text.Label(message,
-                            font_name='Courier New',
-                            font_size=22,
+                            font_name='16bfZX',
+                            font_size=32,
                             bold=True,
                             color=(220, 220, 220, 220),
                             x=window.width // 2, y=(window.height // 2) + 128,
                             anchor_x='center', anchor_y='center')
     label_bye.draw()
-    label_escape = pyglet.text.Label('[Press ENTER to play again or ESC to exit]',
-                            font_name='Courier New',
-                            font_size=18,
-                            bold=True,
+    label_escape = pyglet.text.Label('Press [ENTER] to play again or [ESC] to exit',
+                            font_name='16bfZX',
+                            font_size=32,
                             color=(170, 170, 170, 170),
-                            x=window.width // 2, y=(window.height // 2) - 256,
+                            x=window.width // 2, y=(window.height // 4),
                             anchor_x='center', anchor_y='center')
     label_escape.draw()
 
@@ -272,12 +270,18 @@ def draw_score():
     """ draws score text """
 
     # font_size parameter reflects window size
-    label_score = pyglet.text.Label('Score ' + str(SCORE[0]) + '   Steps ' + str(STEPS[0]),
-                          font_name='Arial',
-                          font_size=int(TILE_SIZE // 2),
-                          bold=True,
-                          x=5, y=WINDOW_HEIGHT - 40)
+    label_score = pyglet.text.Label(str(SCORE[0]),
+                          font_name='16bfZX',
+                          font_size=int(TILE_SIZE),
+                          x=(window.width / 2) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE / 1.2))
     label_score.draw()
+
+    label_steps = pyglet.text.Label(str(STEPS[0]),
+                          font_name='16bfZX',
+                          font_size=int(TILE_SIZE // 2),
+                          color=(48, 114, 255, 255),
+                          x=TILE_SIZE // 5, y=window.height - (TILE_SIZE // 2))
+    label_steps.draw()
 
 
 def draw_all():
@@ -327,6 +331,9 @@ picture_names = collect_filenames()  # get dict with tile names
 snake = pyglet.sprite.Sprite(picture_names['left-dead'])
 food = pyglet.sprite.Sprite(picture_names['apple'])
 game_over_picture = pyglet.sprite.Sprite(picture_names['game_over'])
+
+pyglet.font.add_file('assets/font/16bfZX.ttf')
+my_font = pyglet.font.load('16bfZX, 16')
 
 
 # main loop

@@ -4,5 +4,5 @@ __pycache__
 .vscode
 db.sqlite3
 .DS_Store
-todo.md
+TODO.md
 *old*
