@@ -1,9 +1,7 @@
-import pyglet, random
+import pyglet, random, os
 from pathlib import Path
 from pyglet.window import key
 
-
-# IS_TITLE = True  # if first run, show title screen
 
 def initial_settings():
     """ set global variables """
@@ -16,6 +14,7 @@ def initial_settings():
     global TILE_COUNT_Y
     global SNAKE
     global FOOD
+    global FOOD_TYPE
     global STEPS
     global PRESSED_KEYS
     global SCORE
@@ -23,20 +22,30 @@ def initial_settings():
     global SPEED
     global IS_END
 
-    TILES_DIRECTORY = Path('assets/snake-tiles')
-    WINDOW_WIDTH = 1000
-    WINDOW_HEIGHT = 800
+    TILES_DIRECTORY = Path('assets/gfx')
+    WINDOW_WIDTH = 960   # not recommended to change window size
+    WINDOW_HEIGHT = 768  # due to gfx size differences!
     TILE_SIZE = WINDOW_WIDTH // 20
     TILE_COUNT_X = (WINDOW_WIDTH // TILE_SIZE) - 1
     TILE_COUNT_Y = (WINDOW_HEIGHT // TILE_SIZE) - 1
     SNAKE = [(2, 2), (3, 2), (4, 2)]
     FOOD = [(2, 5)]
+    FOOD_TYPE = "1"
     STEPS = [0]
     PRESSED_KEYS = set()
     SCORE = [0]
     DIRECTION = (1, 0)  # default direction is to the right
     SPEED = .2
     IS_END = False
+
+def create_hiscore_file():
+    """ create hiscore file if not exist and write HISCORE value into it """
+
+    hiscore_file_name = "snake_hiscore"
+    if not os.path.exists(hiscore_file_name):
+        with open(hiscore_file_name, 'w') as hsf:
+            hsf.write("0")
+            hsf.close()
 
 
 def collect_filenames():
@@ -96,6 +105,17 @@ def game_over(message):
 
     if SCORE[0] > HISCORE[0]:
         HISCORE[0] = SCORE[0]
+
+        hiscore_file_name = "snake_hiscore"
+        if os.path.exists(hiscore_file_name):
+            os.remove(hiscore_file_name)
+        else:
+            print("The snake_hiscore file does not exist")
+
+        with open(hiscore_file_name, 'w') as hsf:
+            hsf.write(str(HISCORE[0]))
+            hsf.close()
+
 
     window.clear()
     pyglet.clock.unschedule(tik)
@@ -235,6 +255,8 @@ def test_keys():
 def eat_food():
     """ eat food function """
 
+    global FOOD_TYPE
+
     new_food_x = random.randint(0, TILE_COUNT_X)
     new_food_y = random.randint(0, TILE_COUNT_Y)
 
@@ -245,14 +267,16 @@ def eat_food():
             new_food_x = random.randint(0, TILE_COUNT_X)
             new_food_y = random.randint(0, TILE_COUNT_Y)
 
+        FOOD_TYPE = str(random.randint(1, 4))
+
         FOOD.append((new_food_x, new_food_y))
         del FOOD[0]
 
         # add piece of snake to the end
         SNAKE.insert(0, (SNAKE[0][0], SNAKE[0][1]))
 
-        # print(FOOD)
         SCORE[0] += 1
+
 
 
 def get_image_name(index):
@@ -302,18 +326,18 @@ def draw_score():
     # font_size parameter reflects window size
     label_score = pyglet.text.Label("SC "+str(SCORE[0]),
                             font_name='16bfZX',
-                            font_size=int(TILE_SIZE) * 2,
-                            color=(200, 200, 200, 200),
-                            x=((window.width / 2) / 2) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.5),
+                            font_size=int(TILE_SIZE) * 1.5,
+                            color=(255, 255, 255, 240),
+                            x=((window.width / 2) / 2) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.1),
                             anchor_x='center')
 
     label_score.draw()
 
     label_hi_score = pyglet.text.Label("HI "+str(HISCORE[0]),
                             font_name='16bfZX',
-                            font_size=int(TILE_SIZE) * 2,
-                            color=(200, 200, 200, 200),
-                            x=(((window.width / 2) / 2) * 3) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.5),
+                            font_size=int(TILE_SIZE) * 1.5,
+                            color=(255, 255, 255, 240),
+                            x=(((window.width / 2) / 2) * 3) - int(TILE_SIZE // 2), y=window.height - (TILE_SIZE * 1.1),
                             anchor_x='center')
 
     label_hi_score.draw()
@@ -322,7 +346,7 @@ def draw_score():
                             font_name='16bfZX',
                             font_size=int(TILE_SIZE // 2),
                             color=(48, 114, 255, 255),
-                            x=TILE_SIZE // 5, y=window.height - (TILE_SIZE // 2))
+                            x=TILE_SIZE // 6, y=window.height - (TILE_SIZE // 2))
     label_steps.draw()
 
 
@@ -335,6 +359,10 @@ def draw_all():
         title_screen()
 
     else:
+        playfield_picture.x = 0
+        playfield_picture.y = 0
+        playfield_picture.draw()
+
         draw_score()
 
         # sprite's edges smoothing
@@ -356,17 +384,27 @@ def draw_all():
             # draw food
             # copies snake drawing idea above, but uses "apple" image only
             for index, value in enumerate(FOOD):
-                food_cell = picture_names["apple"]
+                food_cell = picture_names["food" + FOOD_TYPE]
                 food_cell.blit(value[0] * TILE_SIZE, value[1] * TILE_SIZE, width=TILE_SIZE, height=TILE_SIZE)
 
-           
+
+def read_hiscore_from_file():
+    hiscore_file_name = "snake_hiscore"
+    with open(hiscore_file_name, 'r') as hsf:
+        read_data = hsf.read()
+        HISCORE[0] = int(read_data)
+        hsf.close()
+
+
 def restart_game():
-    """ sets all global variables again for game restart """
+    """ sets all global variables again (except HISCORE and IS_TITLE) for game restart """
 
     initial_settings()
 
     global IS_TITLE
     IS_TITLE = False
+
+    read_hiscore_from_file()
 
     window.clear()
     pyglet.clock.schedule_interval(tik, SPEED)
@@ -377,25 +415,32 @@ def restart_game():
 # set vars before initial settings to show title screen and reset hiscore
 global IS_TITLE
 global HISCORE
+
 IS_TITLE = True
 HISCORE = [0]
 
+create_hiscore_file()  # create hiscore file
+read_hiscore_from_file()  # read hiscore from file
 initial_settings()
+
 window = pyglet.window.Window(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
 
 picture_names = collect_filenames()  # get dict with tile names
 
 # set sprites
 snake = pyglet.sprite.Sprite(picture_names['left-dead'])
-food = pyglet.sprite.Sprite(picture_names['apple'])
+
+for food_number in range(1, 4):
+    food = pyglet.sprite.Sprite(picture_names['food' + str(food_number)])
+
 game_over_picture = pyglet.sprite.Sprite(picture_names['game_over'])
 title_name_picture = pyglet.sprite.Sprite(picture_names['title'])
 snake_picture = pyglet.sprite.Sprite(picture_names['snake'])
 pyladies_picture = pyglet.sprite.Sprite(picture_names['pyladies'])
+playfield_picture = pyglet.sprite.Sprite(picture_names['playfield'])
 
 # load font
 pyglet.font.add_file('assets/font/16bfZX.ttf')
-# my_font = pyglet.font.load('16bfZX, 16')
 
 
 # main loop
