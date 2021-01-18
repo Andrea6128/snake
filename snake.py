@@ -39,19 +39,23 @@ def initial_settings():
     IS_END = False
 
 
+def encrypt_and_write_hiscore(item):
+    content = {}
+    content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
+
+    with open(HISCORE_FILENAME, 'w') as hsf:
+        json.dump(content, hsf)
+        hsf.close()
+
+
 def create_hiscore_file():
     """ create hiscore json file if not exist and write HISCORE value
         (which is "0" if file doesn't exist yet) and generated hash into it """
 
+    # write
     item = "0"
-    hiscore_file_name = "snake_hiscore"
-    initial_content = {}
-    initial_content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
-
-    if not os.path.exists(hiscore_file_name):
-        with open(hiscore_file_name, 'w') as hsf:
-            json.dump(initial_content, hsf)
-            hsf.close()
+    if not os.path.exists(HISCORE_FILENAME):
+        encrypt_and_write_hiscore(item)
 
 
 def collect_filenames():
@@ -118,14 +122,10 @@ def game_over(message):
             os.remove(hiscore_file_name)
         else:
             print("The snake_hiscore file does not exist")
-            
+        
+        # write
         item = str(HISCORE[0])
-        content = {}
-        content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
-
-        with open(hiscore_file_name, 'w') as hsf:
-            json.dump(content, hsf)
-            hsf.close()
+        encrypt_and_write_hiscore(item)
 
     window.clear()
     pyglet.clock.unschedule(tik)
@@ -399,8 +399,9 @@ def draw_all():
 
 
 def read_hiscore_from_file():
-    hiscore_file_name = "snake_hiscore"
-    with open(hiscore_file_name, 'r') as hsf:
+    # read
+    # hiscore_file_name = "snake_hiscore"
+    with open(HISCORE_FILENAME, 'r') as hsf:
         content = json.load(hsf)
         key = list(content.keys())[0]
         value = list(content.values())[0]
@@ -434,9 +435,11 @@ def restart_game():
 # set vars before initial settings to show title screen and reset hiscore
 global IS_TITLE
 global HISCORE
+global HISCORE_FILENAME
 
 IS_TITLE = True
 HISCORE = [0]
+HISCORE_FILENAME = 'snake_hiscore'
 
 create_hiscore_file()  # create hiscore file
 read_hiscore_from_file()  # read hiscore from file
