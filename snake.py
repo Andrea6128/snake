@@ -1,5 +1,4 @@
-import pyglet, random, os
-import hashlib, json
+import pyglet, random, os, hashlib, json
 from pathlib import Path
 from pyglet.window import key
 
@@ -39,14 +38,6 @@ def initial_settings():
     SPEED = .2
     IS_END = False
 
-
-def encrypt_hiscore():
-    """ encrypt md5 hash from HISCORE value and return it """
-
-    item = str(HISCORE[0])
-    hiscore_hash = hashlib.md5(bytes(item, 'ascii')).hexdigest()
-    return hiscore_hash
-    
 
 def create_hiscore_file():
     """ create hiscore json file if not exist and write HISCORE value
