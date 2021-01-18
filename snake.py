@@ -1,4 +1,5 @@
 import pyglet, random, os
+import hashlib, json
 from pathlib import Path
 from pyglet.window import key
 
@@ -38,13 +39,27 @@ def initial_settings():
     SPEED = .2
     IS_END = False
 
-def create_hiscore_file():
-    """ create hiscore file if not exist and write HISCORE value into it """
 
+def encrypt_hiscore():
+    """ encrypt md5 hash from HISCORE value and return it """
+
+    item = str(HISCORE[0])
+    hiscore_hash = hashlib.md5(bytes(item, 'ascii')).hexdigest()
+    return hiscore_hash
+    
+
+def create_hiscore_file():
+    """ create hiscore json file if not exist and write HISCORE value
+        (which is "0" if file doesn't exist yet) and generated hash into it """
+
+    item = "0"
     hiscore_file_name = "snake_hiscore"
+    initial_content = {}
+    initial_content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
+
     if not os.path.exists(hiscore_file_name):
         with open(hiscore_file_name, 'w') as hsf:
-            hsf.write("0")
+            json.dump(initial_content, hsf)
             hsf.close()
 
 
@@ -103,6 +118,7 @@ def game_over(message):
     global IS_END
     IS_END = True
 
+    # if new HISCORE is reached, delete old file and write it to the new one
     if SCORE[0] > HISCORE[0]:
         HISCORE[0] = SCORE[0]
 
@@ -111,11 +127,14 @@ def game_over(message):
             os.remove(hiscore_file_name)
         else:
             print("The snake_hiscore file does not exist")
+            
+        item = str(HISCORE[0])
+        content = {}
+        content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
 
         with open(hiscore_file_name, 'w') as hsf:
-            hsf.write(str(HISCORE[0]))
+            json.dump(content, hsf)
             hsf.close()
-
 
     window.clear()
     pyglet.clock.unschedule(tik)
@@ -391,8 +410,17 @@ def draw_all():
 def read_hiscore_from_file():
     hiscore_file_name = "snake_hiscore"
     with open(hiscore_file_name, 'r') as hsf:
-        read_data = hsf.read()
-        HISCORE[0] = int(read_data)
+        content = json.load(hsf)
+        key = list(content.keys())[0]
+        value = list(content.values())[0]
+        
+        if hashlib.md5(bytes(key, 'ascii')).hexdigest() == value:
+            HISCORE[0] = int(key)
+        else:
+            print("The hiscore hash doesn't match, it may have been changed!")
+            hsf.close()
+            quit()
+
         hsf.close()
 
 
@@ -441,7 +469,6 @@ playfield_picture = pyglet.sprite.Sprite(picture_names['playfield'])
 
 # load font
 pyglet.font.add_file('assets/font/16bfZX.ttf')
-
 
 # main loop
 if __name__ == "__main__":
