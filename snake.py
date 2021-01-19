@@ -289,7 +289,8 @@ def eat_food():
             new_food_x = random.randint(0, TILE_COUNT_X)
             new_food_y = random.randint(0, TILE_COUNT_Y)
 
-        FOOD_TYPE = str(random.randint(1, 4))
+        last_food = FOOD_TYPE
+        FOOD_TYPE = str(random.randint(1, 5))
 
         FOOD.append((new_food_x, new_food_y))
         del FOOD[0]
@@ -297,7 +298,10 @@ def eat_food():
         # add piece of snake to the end
         SNAKE.insert(0, (SNAKE[0][0], SNAKE[0][1]))
 
-        SCORE[0] += 1
+        if last_food == "5":
+            SCORE[0] += 5
+        else:
+            SCORE[0] += 1
 
 
 
@@ -458,7 +462,7 @@ picture_names = collect_filenames()  # get dict with tile names
 # set sprites
 snake = pyglet.sprite.Sprite(picture_names['left-dead'])
 
-for food_number in range(1, 4):
+for food_number in range(1, 5):
     food = pyglet.sprite.Sprite(picture_names['food' + str(food_number)])
 
 game_over_picture = pyglet.sprite.Sprite(picture_names['game_over'])

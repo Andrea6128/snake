@@ -2,6 +2,12 @@
 - snake game made as an excercise for pyladies course
 - i was no cheating! :3
 
+# instructions
+- eat food
+- each food increases score by 1, special 'pokeball' food is for 5!
+- don't get out of the playfield
+- cotrol keys -> wsad or arrows
+
 ## requirements
 - python3
 - pyglet
