@@ -3,6 +3,16 @@ from pathlib import Path
 from pyglet.window import key
 
 
+def first_run_initial_settings():
+    global IS_TITLE
+    global HISCORE
+    global HISCORE_FILENAME
+
+    IS_TITLE = True
+    HISCORE = [0]
+    HISCORE_FILENAME = 'snake_hiscore'
+
+
 def initial_settings():
     """ set global variables """
 
@@ -40,6 +50,8 @@ def initial_settings():
 
 
 def encrypt_and_write_hiscore(item):
+    """ encrypts HISCORE value (item) and writes value and hash into json file """
+
     content = {}
     content[item] = hashlib.md5(bytes(item, 'ascii')).hexdigest()
 
@@ -399,8 +411,6 @@ def draw_all():
 
 
 def read_hiscore_from_file():
-    # read
-    # hiscore_file_name = "snake_hiscore"
     with open(HISCORE_FILENAME, 'r') as hsf:
         content = json.load(hsf)
         key = list(content.keys())[0]
@@ -433,16 +443,12 @@ def restart_game():
 # first start
 
 # set vars before initial settings to show title screen and reset hiscore
-global IS_TITLE
-global HISCORE
-global HISCORE_FILENAME
-
-IS_TITLE = True
-HISCORE = [0]
-HISCORE_FILENAME = 'snake_hiscore'
+first_run_initial_settings()
 
 create_hiscore_file()  # create hiscore file
 read_hiscore_from_file()  # read hiscore from file
+
+# set initial variables
 initial_settings()
 
 window = pyglet.window.Window(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)

@@ -15,5 +15,5 @@
 python3 snake.py
 
 ## notes
-- resize game window by changing WINDOW_WIDTH and WINDOW_HEIGHT vars
+- resizing game window not recommended 
 - alter speed by changing SPEED var
