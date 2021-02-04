@@ -1,6 +1,6 @@
 # snake
 - snake game made as an excercise for pyladies course
-- i was no cheating! :3
+- i was not cheating! :3
 
 # instructions
 - eat food
